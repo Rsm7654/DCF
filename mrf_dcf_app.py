@@ -1,4 +1,5 @@
 pip install yfinance numpy pandas
+pip install -r requirements.txt
 
 import streamlit as st
 import yfinance as yf
