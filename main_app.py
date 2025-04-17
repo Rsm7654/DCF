@@ -1,13 +1,13 @@
 import streamlit as st
 import yfinance as yf
+from dcf_valuation import run_dcf
 from price_chart import show_chart
 from financials import show_financials
-from dcf_valuation import run_dcf
 
 st.set_page_config(page_title="📈 Stock Analyzer", layout="wide")
 st.title("📊 Stock Analyzer App")
 
-# --- Company Search --- 
+# --- Company Search ---
 company_query = st.text_input("🔍 Search Company")
 
 ticker_symbol = None
@@ -22,20 +22,20 @@ if company_query:
     except Exception as e:
         st.error(f"Search error: {e}")
 
-# --- Load Data & Show Tabs --- 
+# --- Load Data & Show Tabs ---
 if ticker_symbol:
     ticker = yf.Ticker(ticker_symbol)
 
     tab1, tab2, tab3 = st.tabs(["💸 DCF Valuation", "📈 Price Chart", "📄 Financials"])
 
-    # --- DCF Valuation --- 
+    # --- DCF Valuation ---
     with tab1:
-        # Add your DCF logic here...
+        run_dcf(ticker)
 
-    # --- Price Chart --- 
+    # --- Price Chart ---
     with tab2:
-        show_chart(ticker, ticker_symbol)
+        show_chart(ticker)
 
-    # --- Financials --- 
+    # --- Financials ---
     with tab3:
         show_financials(ticker, ticker_symbol)
