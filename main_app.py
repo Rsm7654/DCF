@@ -24,7 +24,7 @@ if company_query:
 
 # --- Load Data & Show Tabs ---
 if ticker_symbol:
-    show_financials(ticker, ticker_symbol)
+    ticker = yf.Ticker(ticker_symbol)
 
     tab1, tab2, tab3 = st.tabs(["💸 DCF Valuation", "📈 Price Chart", "📄 Financials"])
 
@@ -36,6 +36,6 @@ if ticker_symbol:
     with tab2:
         show_chart(ticker)
 
-    # --- Financials ---
+# --- Financials ---
     with tab3:
-        show_financials(ticker, symbol)
+        show_financials(ticker, ticker_symbol)
