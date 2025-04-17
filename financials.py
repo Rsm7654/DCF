@@ -11,6 +11,50 @@ def format_financials(df):
     df.index.name = "Line Item"
     return df
 
+def show_financials(ticker, symbol):
+    st.subheader(f"📄 Financial Statements - {symbol}")
+
+    try:
+        # Create tabs for Income Statement, Balance Sheet, and Cash Flow
+        tab1, tab2, tab3, tab4 = st.tabs(["🧾 Income Statement", "💰 Balance Sheet", "💸 Cash Flow", "📊 Ratios"])
+
+        with tab1:
+            income = ticker.financials
+            if not income.empty:
+                income_df = format_financials(income)
+                show_income_statement(income_df)
+            else:
+                st.warning("No Income Statement data found.")
+
+        with tab2:
+            balance = ticker.balance_sheet
+            if not balance.empty:
+                balance_df = format_financials(balance)
+                show_balance_sheet(balance_df)
+            else:
+                st.warning("No Balance Sheet data found.")
+
+        with tab3:
+            cashflow = ticker.cashflow
+            if not cashflow.empty:
+                cashflow_df = format_financials(cashflow)
+                show_cashflow_statement(cashflow_df)
+            else:
+                st.warning("No Cash Flow data found.")
+
+        with tab4:
+            income = ticker.financials
+            balance = ticker.balance_sheet
+            if not income.empty and not balance.empty:
+                income_df = format_financials(income)
+                balance_df = format_financials(balance)
+                show_financial_ratios(income_df, balance_df)
+            else:
+                st.warning("Not enough data to compute ratios.")
+
+    except Exception as e:
+        st.error(f"Error loading financial statements: {e}")
+
 def show_income_statement(income_df):
     st.markdown("### 📟 Income Statement")
 
