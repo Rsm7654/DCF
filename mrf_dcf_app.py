@@ -1,4 +1,5 @@
-pip install yfinance numpy pandas
+pip install yfinance --upgrade --no-cache-dir
+pip install numpy pandas
 pip install -r requirements.txt
 
 import streamlit as st
