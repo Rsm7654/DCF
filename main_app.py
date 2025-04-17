@@ -8,11 +8,8 @@ st.set_page_config(page_title="Stock Analyzer", layout="wide")
 
 st.title("📈 Stock Analysis App")
 
-# --- Sidebar: Feature Selection ---
-feature = st.sidebar.selectbox(
-    "Select Feature",
-    ["📊 DCF Valuation", "📈 Price Chart", "📄 Financials"]
-)
+
+
 
 # --- Search for Company ---
 company_query = st.text_input("🔍 Search Company")
