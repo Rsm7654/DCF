@@ -1,5 +1,6 @@
 import streamlit as st
 import yfinance as yf
+import time  # To introduce a small delay for better UX
 
 st.set_page_config(page_title="📈 Stock Analyzer", layout="wide")
 st.title("📊 Stock Analyzer App")
@@ -7,10 +8,13 @@ st.title("📊 Stock Analyzer App")
 # --- State to store search results ---
 if 'search_results' not in st.session_state:
     st.session_state['search_results'] = []
+if 'search_input' not in st.session_state:
+    st.session_state['search_input'] = ""
 
 # --- Function to perform the search ---
 def perform_search(query):
-    if query:
+    st.session_state['search_input'] = query  # Update the stored input
+    if len(query) >= 2:  # Start searching after at least 2 characters
         try:
             search = yf.Search(query)
             st.session_state['search_results'] = search.quotes
@@ -18,10 +22,10 @@ def perform_search(query):
             st.error(f"Search error: {e}")
     else:
         st.session_state['search_results'] = []
+    time.sleep(0.2) # Small delay to prevent excessive API calls
 
 # --- Search Bar ---
-company_query = st.text_input("🔍 Search Company", on_change=perform_search, args=(st.session_state.get('search_input', ""),))
-st.session_state['search_input'] = company_query
+company_query = st.text_input("🔍 Search Company", key="company_query_input", on_change=perform_search, args=(st.session_state.get('search_input', ""),))
 
 # --- Display Recommendations ---
 if st.session_state['search_results']:
@@ -38,12 +42,12 @@ if st.session_state['search_results']:
             st.subheader(f"Analyzing: {selected_company}")
             ticker = yf.Ticker(ticker_symbol)
 
-            tab1, tab2, tab3 = st.tabs(["💸 DCF Valuation", "📈 Price Chart", "📄 Financials"])
-
             # Import your other modules here to avoid circular dependencies
             from dcf_valuation import run_dcf
             from price_chart import show_chart
             from financials import show_financials
+
+            tab1, tab2, tab3 = st.tabs(["💸 DCF Valuation", "📈 Price Chart", "📄 Financials"])
 
             # --- DCF Valuation ---
             with tab1:
@@ -58,5 +62,7 @@ if st.session_state['search_results']:
                 show_financials(ticker, ticker_symbol)
     else:
         st.warning("No relevant companies found.")
-elif company_query:
+elif st.session_state['search_input']:
+    st.info("Keep typing for more recommendations.")
+else:
     st.info("Start typing to see company recommendations.")
