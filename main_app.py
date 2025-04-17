@@ -11,16 +11,14 @@ st.title("📊 Stock Analyzer App")
 company_query = st.text_input("🔍 Search Company")
 
 ticker_symbol = None
-
 if company_query:
     try:
-        # Search for the company using yfinance
-        search = yf.Ticker(company_query)
-        if search.info.get('longName', None):
-            ticker_symbol = company_query
-            st.write(f"Showing results for: {search.info['longName']}")
-        else:
-            st.write("No results found. Try a more specific query.")
+        search = yf.Search(company_query)
+        quotes = search.quotes
+        if quotes:
+            options = [f"{q['shortname']} ({q['symbol']})" for q in quotes if 'shortname' in q]
+            selection = st.selectbox("Select Company", options)
+            ticker_symbol = selection.split('(')[-1].strip(')')
     except Exception as e:
         st.error(f"Search error: {e}")
 
@@ -40,4 +38,4 @@ if ticker_symbol:
 
     # --- Financials ---
     with tab3:
-        show_financials(ticker, ticker_symbol)
+        show_financials(ticker)
