@@ -1,6 +1,5 @@
 import streamlit as st
-import yfinance as yf
-import pandas as pd
+
 
 def show_chart(stock_name):
     st.subheader(f"📈 Stock Price Chart - {stock_name}")
