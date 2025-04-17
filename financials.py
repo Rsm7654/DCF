@@ -18,7 +18,7 @@ def show_financials(ticker, symbol):
         tab1, tab2, tab3, tab4 = st.tabs(["🧾 Income Statement", "💰 Balance Sheet", "💸 Cash Flow", "📊 Ratios"])
 
         with tab1:
-            st.subheader("📊Income Statement")
+            st.subheader("🧾Income Statement")
             income = ticker.financials
             if not income.empty:
                 income_df = format_financials(income)
@@ -27,7 +27,7 @@ def show_financials(ticker, symbol):
                 st.warning("No Income Statement data found.")
 
         with tab2:
-            st.subheader("Balance Sheet")
+            st.subheader("💰Balance Sheet")
             balance = ticker.balance_sheet
             if not balance.empty:
                 balance_df = format_financials(balance)
@@ -36,7 +36,7 @@ def show_financials(ticker, symbol):
                 st.warning("No Balance Sheet data found.")
 
         with tab3:
-            st.subheader("📊Cash Flows")
+            st.subheader("💸Cash Flows")
             if not cashflow.empty:
                 # Debug: Show all items available
                 st.write("📌 Available Cash Flow Line Items:", list(cashflow.index))
