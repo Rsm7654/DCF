@@ -26,9 +26,11 @@ else:
 
 if ticker_symbol:
 
-growth_rate = st.slider("Growth Rate (%)", 0.0, 20.0, 10.0) / 100
-terminal_growth = st.slider("Terminal Growth Rate (%)", 0.0, 10.0, 4.0) / 100
-wacc = st.slider("Discount Rate / WACC (%)", 0.0, 20.0, 10.0) / 100
+# --- User Inputs ---
+    growth_rate = st.slider("Growth Rate (%)", 0.0, 20.0, 10.0) / 100
+    terminal_growth = st.slider("Terminal Growth Rate (%)", 0.0, 10.0, 4.0) / 100
+    wacc = st.slider("Discount Rate / WACC (%)", 0.0, 20.0, 10.0) / 100
+
 
 # --- Fetching Data ---
 try:
