@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 
 st.set_page_config(page_title="Stock Analyzer", layout="wide")
-
 st.title("📈 Stock Analysis App")
 
 # --- Sidebar: Feature Selection ---
@@ -33,9 +32,48 @@ if ticker_symbol:
     ticker = yf.Ticker(ticker_symbol)
 
     if feature == "📊 DCF Valuation":
-        # (Add DCF logic here — as you already have)
+        st.subheader(f"💸 DCF Valuation - {ticker_symbol}")
 
-        st.subheader("💸 Valuation Coming Soon!")
+        # --- User Inputs ---
+        growth_rate = st.slider("Growth Rate (%)", 0.0, 20.0, 10.0) / 100
+        terminal_growth = st.slider("Terminal Growth Rate (%)", 0.0, 10.0, 4.0) / 100
+        wacc = st.slider("Discount Rate / WACC (%)", 0.0, 20.0, 10.0) / 100
+
+        try:
+            cashflow = ticker.cashflow
+            ocf = cashflow.loc["Operating Cash Flow"]
+            capex = cashflow.loc["Capital Expenditure"]
+            fcf = ocf + capex  # Free Cash Flow
+
+            fcf = fcf.dropna()
+            avg_fcf = fcf.iloc[:3].mean()
+
+            # --- Forecast FCFs ---
+            forecast_years = 5
+            future_fcfs = [avg_fcf * (1 + growth_rate) ** i for i in range(1, forecast_years + 1)]
+
+            # --- Terminal Value ---
+            terminal_value = future_fcfs[-1] * (1 + terminal_growth) / (wacc - terminal_growth)
+
+            # --- Discounting ---
+            discounted_fcfs = [fcf / (1 + wacc) ** i for i, fcf in enumerate(future_fcfs, 1)]
+            discounted_terminal = terminal_value / (1 + wacc) ** forecast_years
+
+            # --- Valuation ---
+            enterprise_value = sum(discounted_fcfs) + discounted_terminal
+
+            st.markdown(f"### 📌 Estimated Enterprise Value: ₹{enterprise_value:,.2f}")
+
+            # --- FCF Table ---
+            fcf_df = pd.DataFrame({
+                "Year": [f"Year {i}" for i in range(1, forecast_years + 1)],
+                "Future FCF (₹)": future_fcfs,
+                "Discounted FCF (₹)": discounted_fcfs
+            })
+            st.dataframe(fcf_df.set_index("Year"))
+
+        except Exception as e:
+            st.error(f"Error in DCF calculation: {e}")
 
     elif feature == "📈 Price Chart":
         st.subheader(f"📈 Stock Price Chart - {ticker_symbol}")
