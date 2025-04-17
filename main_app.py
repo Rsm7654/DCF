@@ -80,4 +80,4 @@ if ticker_symbol:
 
         show_financials(ticker, ticker_symbol)
 
-i need searching recommendation
+
