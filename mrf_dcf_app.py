@@ -7,12 +7,25 @@ import pandas as pd
 st.title("💸 MRF DCF Valuation Model")
 
 # --- User Inputs ---
-popular_tickers = [
-    "MRF.NS", "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ITC.NS", 
-    "AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META"
-]
+companies = {
+    "MRF Ltd": "MRF.NS",
+    "Reliance Industries": "RELIANCE.NS",
+    "Tata Consultancy Services": "TCS.NS",
+    "HDFC Bank": "HDFCBANK.NS",
+    "Infosys": "INFY.NS",
+    "ITC Ltd": "ITC.NS",
+    "Apple Inc.": "AAPL",
+    "Microsoft": "MSFT",
+    "Google (Alphabet)": "GOOGL",
+    "Amazon": "AMZN",
+    "Tesla": "TSLA",
+    "Meta Platforms": "META"
+}
 
-ticker_symbol = st.selectbox("Search Stock Ticker", options=popular_tickers, index=0)
+# Dropdown shows names, not symbols
+selected_company = st.selectbox("🔍 Search Company", options=sorted(companies.keys()))
+ticker_symbol = companies[selected_company]
+
 
 growth_rate = st.slider("Growth Rate (%)", 0.0, 20.0, 10.0) / 100
 terminal_growth = st.slider("Terminal Growth Rate (%)", 0.0, 10.0, 4.0) / 100
