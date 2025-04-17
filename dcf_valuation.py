@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import numpy as np
 
 def run_dcf(ticker):
@@ -12,7 +13,8 @@ def run_dcf(ticker):
         cashflow = ticker.cashflow
         ocf = cashflow.loc["Operating Cash Flow"]
         capex = cashflow.loc["Capital Expenditure"]
-        fcf = ocf + capex
+
+        fcf = ocf + capex  # Note: CapEx is negative
         fcf = fcf.dropna()
         avg_fcf = fcf.iloc[:3].mean()
 
@@ -33,6 +35,10 @@ def run_dcf(ticker):
         st.dataframe(fcf_df.set_index("Year"))
 
         st.line_chart(fcf_df.set_index("Year")[["Future FCF (₹ Crores)", "Discounted FCF (₹ Crores)"]])
+
+        st.write(f"📌 **Terminal Value (Discounted)**: ₹{discounted_terminal:,.2f}")
+        st.write(f"📌 **Sum of Discounted FCFs**: ₹{sum(discounted_fcfs):,.2f}")
+        st.write(f"📌 **Enterprise Value = DCFs + Terminal Value**")
 
     except Exception as e:
         st.error(f"Error in DCF calculation: {e}")
