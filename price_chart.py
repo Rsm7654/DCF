@@ -1,6 +1,9 @@
 import streamlit as st
 import yfinance as yf
 
+# Set page config at the top of the script
+st.set_page_config(page_title="📈 Stock Analyzer", layout="wide")
+
 def show_chart(ticker, symbol):
     st.subheader(f"📈 Stock Price Chart - {symbol}")
     
