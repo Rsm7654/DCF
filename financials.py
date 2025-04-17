@@ -2,38 +2,44 @@ import streamlit as st
 import pandas as pd
 
 def format_financials(df):
-    """Transpose, clean, and format numbers to ₹ crores."""
-    df = df.T
-    df.index = pd.to_datetime(df.index).year  # Show only the year (e.g., 2022)
-    df = df / 1e7  # Convert to ₹ crores (assuming values in ₹)
+    """Reformat financials: rows = items, columns = years in ₹ Crores."""
+    df = df / 1e7  # Convert from ₹ to ₹ Crores
     df = df.round(2)
-    df.index.name = "Year"
+    df = df.fillna(0)
+    df.columns = pd.to_datetime(df.columns).year  # Show only fiscal year
+    df.index.name = "Line Item"
     return df
 
 def show_financials(ticker, symbol):
     st.subheader(f"📄 Financial Statements - {symbol}")
 
     try:
-        st.write("### 🧾 Income Statement (₹ Crores)")
-        income_df = ticker.financials
-        if not income_df.empty:
-            st.dataframe(format_financials(income_df))
+        # --- Income Statement ---
+        st.markdown("### 🧾 Income Statement (₹ Crores)")
+        income = ticker.financials
+        if not income.empty:
+            income_df = format_financials(income)
+            st.dataframe(income_df)
         else:
-            st.warning("No Income Statement data available.")
+            st.warning("No Income Statement data found.")
 
-        st.write("### 💰 Balance Sheet (₹ Crores)")
-        balance_df = ticker.balance_sheet
-        if not balance_df.empty:
-            st.dataframe(format_financials(balance_df))
+        # --- Balance Sheet ---
+        st.markdown("### 💰 Balance Sheet (₹ Crores)")
+        balance = ticker.balance_sheet
+        if not balance.empty:
+            balance_df = format_financials(balance)
+            st.dataframe(balance_df)
         else:
-            st.warning("No Balance Sheet data available.")
+            st.warning("No Balance Sheet data found.")
 
-        st.write("### 💸 Cash Flow Statement (₹ Crores)")
-        cashflow_df = ticker.cashflow
-        if not cashflow_df.empty:
-            st.dataframe(format_financials(cashflow_df))
+        # --- Cash Flow Statement ---
+        st.markdown("### 💸 Cash Flow Statement (₹ Crores)")
+        cashflow = ticker.cashflow
+        if not cashflow.empty:
+            cashflow_df = format_financials(cashflow)
+            st.dataframe(cashflow_df)
         else:
-            st.warning("No Cash Flow data available.")
+            st.warning("No Cash Flow data found.")
 
     except Exception as e:
-        st.error(f"Error loading financial data: {e}")
+        st.error(f"Error loading financial statements: {e}")
