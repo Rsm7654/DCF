@@ -6,26 +6,25 @@ import pandas as pd
 
 st.title("💸 MRF DCF Valuation Model")
 
-# --- User Inputs ---
-companies = {
-    "MRF Ltd": "MRF.NS",
-    "Reliance Industries": "RELIANCE.NS",
-    "Tata Consultancy Services": "TCS.NS",
-    "HDFC Bank": "HDFCBANK.NS",
-    "Infosys": "INFY.NS",
-    "ITC Ltd": "ITC.NS",
-    "Apple Inc.": "AAPL",
-    "Microsoft": "MSFT",
-    "Google (Alphabet)": "GOOGL",
-    "Amazon": "AMZN",
-    "Tesla": "TSLA",
-    "Meta Platforms": "META"
-}
+company_query = st.text_input("🔍 Enter Company Name", value="MRF")
 
-# Dropdown shows names, not symbols
-selected_company = st.selectbox("🔍 Search Company", options=sorted(companies.keys()))
-ticker_symbol = companies[selected_company]
+if company_query:
+    search = yf.Search(company_query)
+    quotes = search.quotes
 
+    if quotes:
+        # Create a list of options with company name and symbol
+        options = [f"{item['shortname']} ({item['symbol']})" for item in quotes]
+        selection = st.selectbox("Select a company", options)
+        # Extract the selected symbol
+        ticker_symbol = selection.split('(')[-1].strip(')')
+    else:
+        st.warning("No matching companies found.")
+        ticker_symbol = None
+else:
+    ticker_symbol = None
+
+if ticker_symbol:
 
 growth_rate = st.slider("Growth Rate (%)", 0.0, 20.0, 10.0) / 100
 terminal_growth = st.slider("Terminal Growth Rate (%)", 0.0, 10.0, 4.0) / 100
