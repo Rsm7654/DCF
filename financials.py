@@ -4,20 +4,21 @@ import pandas as pd
 def format_financials(df):
     """Reformat financials: rows = items, columns = years in ₹ Crores."""
     df = df / 1e7  # Convert from ₹ to ₹ Crores
-    df = df.round(2)
-    df = df.fillna(0)
+    df = df.round(2)  # Round to two decimal places
+    df = df.fillna(0)  # Fill NaN values with 0
     df.columns = pd.to_datetime(df.columns).year  # Show only fiscal year
-    df.index.name = "Line Item"
+    df.index.name = "Line Item"  # Name the index
     return df
 
 def show_financials(ticker, symbol):
     st.subheader(f"📄 Financial Statements - {symbol}")
 
     try:
-        # Create tabs
+        # Create tabs for Income Statement, Balance Sheet, and Cash Flow
         tab1, tab2, tab3 = st.tabs(["🧾 Income Statement", "💰 Balance Sheet", "💸 Cash Flow"])
 
         with tab1:
+            # Income Statement
             income = ticker.financials
             if not income.empty:
                 income_df = format_financials(income)
@@ -26,6 +27,7 @@ def show_financials(ticker, symbol):
                 st.warning("No Income Statement data found.")
 
         with tab2:
+            # Balance Sheet
             balance = ticker.balance_sheet
             if not balance.empty:
                 balance_df = format_financials(balance)
@@ -34,6 +36,7 @@ def show_financials(ticker, symbol):
                 st.warning("No Balance Sheet data found.")
 
         with tab3:
+            # Cash Flow
             cashflow = ticker.cashflow
             if not cashflow.empty:
                 cashflow_df = format_financials(cashflow)
