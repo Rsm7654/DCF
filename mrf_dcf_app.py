@@ -7,15 +7,13 @@ import pandas as pd
 st.title("💸 MRF DCF Valuation Model")
 
 # --- User Inputs ---
-use_custom = st.checkbox("Enter custom ticker")
-if use_custom:
-    ticker_symbol = st.text_input("Enter Stock Ticker", value="MRF.NS")
-else:
-    ticker_symbol = st.selectbox(
-        "Choose from popular stocks",
-        options=["MRF.NS", "RELIANCE.NS", "TCS.NS", "AAPL", "TSLA"],
-        index=0
-    )
+popular_tickers = [
+    "MRF.NS", "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ITC.NS", 
+    "AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META"
+]
+
+ticker_symbol = st.selectbox("Search Stock Ticker", options=popular_tickers, index=0)
+
 growth_rate = st.slider("Growth Rate (%)", 0.0, 20.0, 10.0) / 100
 terminal_growth = st.slider("Terminal Growth Rate (%)", 0.0, 10.0, 4.0) / 100
 wacc = st.slider("Discount Rate / WACC (%)", 0.0, 20.0, 10.0) / 100
