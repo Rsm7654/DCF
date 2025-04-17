@@ -20,12 +20,3 @@ def show_chart(ticker, symbol):
     except Exception as e:
         st.error(f"Error fetching stock data: {e}")
 
-# Streamlit user input for stock ticker
-ticker_input = st.text_input("Enter stock ticker", "AAPL")
-symbol_input = ticker_input.upper()
-
-# Fetch the ticker data using yfinance
-ticker = yf.Ticker(symbol_input)
-
-# Show the chart
-show_chart(ticker, symbol_input)
