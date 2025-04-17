@@ -37,6 +37,6 @@ if ticker_symbol:
         show_chart(ticker)
 
 # --- Financials ---
-with tab3:
-    show_financials(ticker, ticker_symbol)
+    with tab3:
+        show_financials(ticker, ticker_symbol)
 
