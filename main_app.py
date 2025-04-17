@@ -16,9 +16,17 @@ if company_query:
         search = yf.Search(company_query)
         quotes = search.quotes
         if quotes:
-            options = [f"{q['shortname']} ({q['symbol']})" for q in quotes if 'shortname' in q]
-            selection = st.selectbox("Select Company", options)
-            ticker_symbol = selection.split('(')[-1].strip(')')
+            # Filter out results without a short name (less informative)
+            valid_quotes = [q for q in quotes if 'shortname' in q and 'symbol' in q]
+
+            if not valid_quotes:
+                st.warning("No relevant companies found. Please try a different search term.")
+            else:
+                options = [f"{q['shortname']} ({q['symbol']})" for q in valid_quotes]
+                selection = st.selectbox("Select Company", options)
+                ticker_symbol = selection.split('(')[-1].strip(')')
+        else:
+            st.warning("No companies found matching your search query.")
     except Exception as e:
         st.error(f"Search error: {e}")
 
@@ -36,7 +44,6 @@ if ticker_symbol:
     with tab2:
         show_chart(ticker)
 
-# --- Financials ---
+    # --- Financials ---
     with tab3:
         show_financials(ticker, ticker_symbol)
-
