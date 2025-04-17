@@ -38,4 +38,4 @@ if ticker_symbol:
 
     # --- Financials ---
     with tab3:
-        show_financials(ticker)
+        show_financials(ticker, symbol)
