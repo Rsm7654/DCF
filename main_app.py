@@ -8,9 +8,6 @@ st.set_page_config(page_title="Stock Analyzer", layout="wide")
 
 st.title("📈 Stock Analysis App")
 
-
-
-
 # --- Search for Company ---
 company_query = st.text_input("🔍 Search Company")
 
@@ -30,11 +27,10 @@ if company_query:
 if ticker_symbol:
     ticker = yf.Ticker(ticker_symbol)
 
-    # Create tabs
-    tabs = ["DCF Valuation", "Price Chart", "Financials"]
-    tab = st.radio("Select Tab", tabs)
+    # Create clickable tabs for the three features
+    tab = st.radio("Select Tab", ["📊 DCF Valuation", "📈 Price Chart", "📄 Financials"])
 
-    if tab == "DCF Valuation":
+    if tab == "📊 DCF Valuation":
         # DCF Valuation logic here
         st.subheader("💸 DCF Valuation")
 
@@ -73,13 +69,13 @@ if ticker_symbol:
         except Exception as e:
             st.error(f"Error fetching or processing data for DCF: {e}")
 
-    elif tab == "Price Chart":
+    elif tab == "📈 Price Chart":
         # Price Chart logic here
         st.subheader(f"📈 Stock Price Chart - {ticker_symbol}")
         hist = ticker.history(period="5y")
         st.line_chart(hist["Close"])
 
-    elif tab == "Financials":
+    elif tab == "📄 Financials":
         # Financials logic here
         st.subheader(f"📄 Financial Statements - {ticker_symbol}")
 
