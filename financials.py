@@ -1,7 +1,5 @@
 import streamlit as st
 import pandas as pd
-import yfinance as yf
-
 # ---------- Helper Functions ----------
 
 def format_financials(df):
