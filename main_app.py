@@ -39,12 +39,16 @@ if ticker_symbol:
 
     # --- DCF Valuation --- 
     with tab1:
-        # Your DCF Valuation code here...
+        # Add your DCF Valuation code here
+        st.write("💸 DCF Valuation placeholder")
 
     # --- Price Chart --- 
     with tab2:
-        # Your Price Chart code here...
+        # Add your Price Chart code here
+        st.write("📈 Price Chart placeholder")
 
     # --- Financials --- 
     with tab3:
-        # Your Financials code here...
+        # Add your Financials code here
+        st.write("📄 Financials placeholder")
+
