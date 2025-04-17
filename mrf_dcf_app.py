@@ -12,8 +12,8 @@ ticker_symbol = None
 
 if company_query:
     try:
-        search = yf.utils.get_json("https://query2.finance.yahoo.com/v1/finance/search", params={"q": company_query})
-        quotes = search.get("quotes", [])
+        search = yf.Search(company_query)
+        quotes = search.quotes
         if quotes:
             options = [f"{item['shortname']} ({item['symbol']})" for item in quotes if "shortname" in item and "symbol" in item]
             selection = st.selectbox("Select a company", options)
