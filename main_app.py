@@ -1,19 +1,25 @@
-# app.py
 import streamlit as st
-from dcf_valuation import run_dcf
-from price_chart import run_price_chart
-from financials import run_financials
+import yfinance as yf
+import numpy as np
+import pandas as pd
 
-st.set_page_config(page_title="📈 Stock Analyzer", layout="wide")
-st.title("📊 Stock Analyzer App")
+# Set page config
+st.set_page_config(page_title="Stock Analyzer", layout="wide")
 
-# --- Company Search ---
+st.title("📈 Stock Analysis App")
+
+# --- Sidebar: Feature Selection ---
+feature = st.sidebar.selectbox(
+    "Select Feature",
+    ["📊 DCF Valuation", "📈 Price Chart", "📄 Financials"]
+)
+
+# --- Search for Company ---
 company_query = st.text_input("🔍 Search Company")
 
 ticker_symbol = None
 if company_query:
     try:
-        import yfinance as yf
         search = yf.Search(company_query)
         quotes = search.quotes
         if quotes:
@@ -23,15 +29,20 @@ if company_query:
     except Exception as e:
         st.error(f"Search error: {e}")
 
-# --- Load Tabs if Company Selected ---
+# --- Tabs for each feature ---
 if ticker_symbol:
-    tab1, tab2, tab3 = st.tabs(["💸 DCF Valuation", "📈 Price Chart", "📄 Financials"])
+    ticker = yf.Ticker(ticker_symbol)
 
-    with tab1:
-        run_dcf(ticker_symbol)
+    # Create tabs
+    tabs = ["DCF Valuation", "Price Chart", "Financials"]
+    tab = st.radio("Select Tab", tabs)
 
-    with tab2:
-        run_price_chart(ticker_symbol)
+    if tab == "DCF Valuation":
+        # DCF Valuation logic here
+        st.subheader("💸 DCF Valuation")
 
-    with tab3:
-        run_financials(ticker_symbol)
+        growth_rate = st.slider("Growth Rate (%)", 0.0, 20.0, 10.0) / 100
+        terminal_growth = st.slider("Terminal Growth Rate (%)", 0.0, 10.0, 4.0) / 100
+        wacc = st.slider("Discount Rate / WACC (%)", 0.0, 20.0, 10.0) / 100
+
+        # Fetching
