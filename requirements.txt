@@ -1,4 +1,4 @@
-
+plotly
 yfinance
 numpy
 pandas
