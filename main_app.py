@@ -1,20 +1,24 @@
-import yfinance as yf
 import streamlit as st
+import yfinance as yf
+from dcf_valuation import run_dcf
+from price_chart import show_chart
+from financials import show_financials
+
+st.set_page_config(page_title="📈 Stock Analyzer", layout="wide")
+st.title("📊 Stock Analyzer App")
 
 # --- Company Search ---
-
-company_query = st.text_input("🔍 Search Company", key="company_search")
+company_query = st.text_input("🔍 Search Company")
 
 ticker_symbol = None
 
 if company_query:
     try:
-        # Fetch top search results using yfinance or an external API
-        search_results = yf.Ticker(company_query).info.get('longName', None)
-
-        if search_results:
-            st.write(f"Showing results for: {search_results}")
+        # Fetching the stock ticker symbol based on company query
+        search = yf.Ticker(company_query)
+        if search.info.get('longName', None):
             ticker_symbol = company_query
+            st.write(f"Showing results for: {search.info['longName']}")
         else:
             st.write("No results found. Try a more specific query.")
     except Exception as e:
