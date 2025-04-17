@@ -14,8 +14,8 @@ feature = st.sidebar.selectbox(
 
 # --- Search for Company ---
 company_query = st.text_input("🔍 Search Company")
-
 ticker_symbol = None
+
 if company_query:
     try:
         search = yf.Search(company_query)
@@ -32,7 +32,7 @@ if ticker_symbol:
     ticker = yf.Ticker(ticker_symbol)
 
     if feature == "📊 DCF Valuation":
-        st.subheader(f"💸 DCF Valuation - {ticker_symbol}")
+        st.subheader("💸 DCF Valuation")
 
         # --- User Inputs ---
         growth_rate = st.slider("Growth Rate (%)", 0.0, 20.0, 10.0) / 100
@@ -56,24 +56,24 @@ if ticker_symbol:
             terminal_value = future_fcfs[-1] * (1 + terminal_growth) / (wacc - terminal_growth)
 
             # --- Discounting ---
-            discounted_fcfs = [fcf / (1 + wacc) ** i for i, fcf in enumerate(future_fcfs, 1)]
+            discounted_fcfs = [fcf / (1 + wacc) ** i for i, fcf in enumerate(future_fcfs, start=1)]
             discounted_terminal = terminal_value / (1 + wacc) ** forecast_years
 
             # --- Valuation ---
             enterprise_value = sum(discounted_fcfs) + discounted_terminal
 
-            st.markdown(f"### 📌 Estimated Enterprise Value: ₹{enterprise_value:,.2f}")
+            st.write(f"**Estimated Enterprise Value (INR):** ₹{enterprise_value:,.2f}")
 
             # --- FCF Table ---
             fcf_df = pd.DataFrame({
-                "Year": [f"Year {i}" for i in range(1, forecast_years + 1)],
+                "Year": [f"Year {i}" for i in range(1, 6)],
                 "Future FCF (₹)": future_fcfs,
                 "Discounted FCF (₹)": discounted_fcfs
             })
             st.dataframe(fcf_df.set_index("Year"))
 
         except Exception as e:
-            st.error(f"Error in DCF calculation: {e}")
+            st.error(f"Error fetching or processing data: {e}")
 
     elif feature == "📈 Price Chart":
         st.subheader(f"📈 Stock Price Chart - {ticker_symbol}")
