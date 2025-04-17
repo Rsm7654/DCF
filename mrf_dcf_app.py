@@ -1,4 +1,4 @@
-pip install yfinance --upgrade --no-cache-dir
+pip install yfinance
 pip install numpy pandas
 pip install -r requirements.txt
 
