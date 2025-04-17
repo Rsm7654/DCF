@@ -1,6 +1,5 @@
-!pip install yfinance
-!pip install numpay
-!pip install pandas
+pip install yfinance numpy pandas
+
 import streamlit as st
 import yfinance as yf
 import numpy as np
