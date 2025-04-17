@@ -1,26 +1,35 @@
 import streamlit as st
 import yfinance as yf
-from dcf_valuation import run_dcf
-from price_chart import show_chart
-from financials import show_financials
+
+# Function to get suggestions based on the search query
+def get_suggestions(company_query):
+    """Fetch company suggestions from Yahoo Finance based on the input query."""
+    try:
+        search = yf.search(company_query)
+        quotes = search['quotes']
+        return [f"{q['shortname']} ({q['symbol']})" for q in quotes if 'shortname' in q]
+    except Exception as e:
+        st.error(f"Error fetching suggestions: {e}")
+        return []
 
 st.set_page_config(page_title="📈 Stock Analyzer", layout="wide")
 st.title("📊 Stock Analyzer App")
 
-# --- Company Search ---
+# --- Company Search with Suggestions ---
 company_query = st.text_input("🔍 Search Company")
 
-ticker_symbol = None
 if company_query:
-    try:
-        search = yf.Search(company_query)
-        quotes = search.quotes
-        if quotes:
-            options = [f"{q['shortname']} ({q['symbol']})" for q in quotes if 'shortname' in q]
-            selection = st.selectbox("Select Company", options)
-            ticker_symbol = selection.split('(')[-1].strip(')')
-    except Exception as e:
-        st.error(f"Search error: {e}")
+    # Get company suggestions based on the query
+    suggestions = get_suggestions(company_query)
+    
+    if suggestions:
+        selection = st.selectbox("Select a Company", suggestions)
+        ticker_symbol = selection.split('(')[-1].strip(')')
+    else:
+        st.warning("No suggestions found.")
+        ticker_symbol = None
+else:
+    ticker_symbol = None
 
 # --- Load Data & Show Tabs ---
 if ticker_symbol:
@@ -28,14 +37,14 @@ if ticker_symbol:
 
     tab1, tab2, tab3 = st.tabs(["💸 DCF Valuation", "📈 Price Chart", "📄 Financials"])
 
-    # --- DCF Valuation ---
+    # --- DCF Valuation --- 
     with tab1:
-        run_dcf(ticker)
+        # Your DCF Valuation code here...
 
-    # --- Price Chart ---
+    # --- Price Chart --- 
     with tab2:
-        show_chart(ticker)
+        # Your Price Chart code here...
 
-    # --- Financials ---
+    # --- Financials --- 
     with tab3:
-        show_financials(ticker, ticker_symbol)
+        # Your Financials code here...
