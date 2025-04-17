@@ -1,0 +1,6 @@
+# Create requirements.txt with yfinance as the dependency
+with open("requirements.txt", "w") as f:
+    f.write("yfinance\n")
+    f.write("streamlit\n")
+    f.write("numpy\n")
+    f.write("pandas\n")
