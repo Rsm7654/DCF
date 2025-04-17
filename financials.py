@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
+
 # ---------- Helper Functions ----------
 
 def format_financials(df):
-    """Reformat financials: rows = items, columns = years in ₹ Crores."""
     df = df / 1e7  # Convert from ₹ to ₹ Crores
     df = df.round(2)
     df = df.fillna(0)
@@ -12,7 +12,7 @@ def format_financials(df):
     return df
 
 def show_income_statement(income_df):
-    st.markdown("### 🧾 Income Statement")
+    st.markdown("### 📟 Income Statement")
 
     line_items = [
         "Total Revenue",
@@ -153,62 +153,3 @@ def show_financial_ratios(income_df, balance_df):
 
     except Exception as e:
         st.error(f"Error calculating ratios: {e}")
-
-# ---------- Main App ----------
-
-def main():
-    st.title("📊 Stock Financial Analyzer")
-
-    symbol = st.text_input("Enter stock ticker (e.g., TCS.NS, INFY.NS):")
-
-    if symbol:
-        try:
-            ticker = yf.Ticker(symbol)
-
-            income = ticker.financials
-            balance = ticker.balance_sheet
-            cashflow = ticker.cashflow
-
-            if income.empty and balance.empty and cashflow.empty:
-                st.warning("No financial data found for this symbol.")
-                return
-
-            tab1, tab2, tab3, tab4 = st.tabs([
-                "🧾 Income Statement",
-                "💰 Balance Sheet",
-                "💸 Cash Flow",
-                "📊 Ratios"
-            ])
-
-            with tab1:
-                if not income.empty:
-                    income_df = format_financials(income)
-                    show_income_statement(income_df)
-                else:
-                    st.warning("No Income Statement data found.")
-
-            with tab2:
-                if not balance.empty:
-                    balance_df = format_financials(balance)
-                    show_balance_sheet(balance_df)
-                else:
-                    st.warning("No Balance Sheet data found.")
-
-            with tab3:
-                if not cashflow.empty:
-                    cashflow_df = format_financials(cashflow)
-                    show_cashflow_statement(cashflow_df)
-                else:
-                    st.warning("No Cash Flow data found.")
-
-            with tab4:
-                if not income.empty and not balance.empty:
-                    show_financial_ratios(income_df, balance_df)
-                else:
-                    st.warning("Insufficient data to calculate ratios.")
-
-        except Exception as e:
-            st.error(f"Failed to load data: {e}")
-
-if __name__ == "__main__":
-    main()
