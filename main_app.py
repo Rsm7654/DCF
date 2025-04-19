@@ -7,6 +7,7 @@ import io
 from dcf_valuation import run_dcf
 from price_chart import show_chart
 from financials import show_financials
+from peer_comparison import Peer-to-peer Comparison
 
 st.set_page_config(page_title="📈 Stock Analyzer", layout="wide")
 st.title("📊 Stock Analyzer App")
