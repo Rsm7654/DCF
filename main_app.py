@@ -16,31 +16,32 @@ github_excel_url = "https://raw.githubusercontent.com/Rsm7654/DCF/main/Stock_lis
 ticker_symbol = None
 
 try:
-    # Download Excel from GitHub
+    # Download and read Excel
     response = requests.get(github_excel_url)
     response.raise_for_status()
     file_bytes = io.BytesIO(response.content)
     df_stocks = pd.read_excel(file_bytes, engine='openpyxl')
 
 
-    # --- Search box ---
-    company_query = st.text_input("🔍 Search Company or Ticker", "").lower()
+    # --- Search Input ---
+    company_query = st.text_input("🔍 Start typing to search Company or Ticker")
 
-    # --- Filter stock list ---
     if company_query:
+        # Filter top 5 matches
         filtered_df = df_stocks[df_stocks.apply(
-            lambda row: company_query in str(row.get('Company', '')).lower() or company_query in str(row.get('Ticker', '')).lower(), axis=1
-        )]
+            lambda row: company_query.lower() in str(row.get('Company', '')).lower() 
+                        or company_query.lower() in str(row.get('Ticker', '')).lower(),
+            axis=1
+        )].head(5)
 
         if not filtered_df.empty:
-            # Combine company and ticker for display
-            options = filtered_df.apply(lambda row: f"{row['Company']} ({row['Ticker']})", axis=1)
-            selected = st.selectbox("Select Company", options)
-
-            # Extract ticker
-            ticker_symbol = selected.split('(')[-1].strip(')')
+            dropdown_options = filtered_df.apply(lambda row: f"{row['Company']} ({row['Ticker']})", axis=1)
+            selected_option = st.selectbox("Select from suggestions", dropdown_options)
+            ticker_symbol = selected_option.split("(")[-1].strip(")")
         else:
-            st.warning("No matching company/ticker found.")
+            st.warning("No matching results found.")
+    else:
+        st.info("Start typing above to search for a company...")
 
 except Exception as e:
     st.error(f"Error loading stock list: {e}")
