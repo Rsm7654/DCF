@@ -44,7 +44,7 @@ except Exception as e:
 if ticker_symbol:
     ticker = yf.Ticker(ticker_symbol)
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Peer-to-peer Comparison"💸 DCF Valuation", "📈 Price Chart", "📄 Financials"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Peer-to-peer Comparison", "💸 DCF Valuation", "📈 Price Chart", "📄 Financials"])
 
     with tab1:
         peer comparison(ticker)
