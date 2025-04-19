@@ -9,7 +9,7 @@ st.set_page_config(page_title="📈 Stock Analyzer", layout="wide")
 st.title("📊 Stock Analyzer App")
 
 # --- Load Excel File from GitHub ---
-github_excel_url = "https://raw.githubusercontent.com/your-username/your-repo-name/main/stock_list.xlsx"
+github_excel_url = "https://raw.githubusercontent.com/your-username/your-repo-name/main/Stock_list(1).xlsx"
 try:
     df_stocks = pd.read_excel(github_excel_url)
     st.success("✅ Stock list loaded from GitHub.")
