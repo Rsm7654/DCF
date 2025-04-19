@@ -46,8 +46,8 @@ if ticker_symbol:
 
     tab1, tab2, tab3, tab4 = st.tabs(["Peer-to-peer Comparison", "💸 DCF Valuation", "📈 Price Chart", "📄 Financials"])
 
-   with tab1:
-    peer_comparison(ticker_symbol, df_stocks)
+    with tab1:
+        peer_comparison(ticker)
 
     with tab2:
         run_dcf(ticker)
