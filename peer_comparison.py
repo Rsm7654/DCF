@@ -6,7 +6,11 @@ def fetch_sector(ticker_symbol):
     try:
         ticker = yf.Ticker(ticker_symbol)
         info = ticker.info
-        return info.get('sector', None)  # Fetch the sector info, return None if not available
+        if 'sector' in info:
+            return info['sector']  # Fetch the sector info
+        else:
+            st.warning(f"Sector information not available for {ticker_symbol}")
+            return None
     except Exception as e:
         st.error(f"Error fetching sector for {ticker_symbol}: {e}")
         return None
