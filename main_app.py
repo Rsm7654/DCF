@@ -22,26 +22,19 @@ try:
     file_bytes = io.BytesIO(response.content)
     df_stocks = pd.read_excel(file_bytes, engine='openpyxl')
 
+    st.success("✅ Stock list loaded.")
 
-    # --- Search Input ---
-    company_query = st.text_input("🔍 Start typing to search Company or Ticker")
+    # --- Build dropdown options
+    df_stocks["SearchDisplay"] = df_stocks["Company"] + " (" + df_stocks["Ticker"] + ")"
+    search_selection = st.selectbox(
+        "🔍 Search and Select Company",
+        df_stocks["SearchDisplay"].tolist(),
+        index=None,
+        placeholder="Type to search...",
+    )
 
-    if company_query:
-        # Filter top 5 matches
-        filtered_df = df_stocks[df_stocks.apply(
-            lambda row: company_query.lower() in str(row.get('Company', '')).lower() 
-                        or company_query.lower() in str(row.get('Ticker', '')).lower(),
-            axis=1
-        )].head(5)
-
-        if not filtered_df.empty:
-            dropdown_options = filtered_df.apply(lambda row: f"{row['Company']} ({row['Ticker']})", axis=1)
-            selected_option = st.selectbox("Select from suggestions", dropdown_options)
-            ticker_symbol = selected_option.split("(")[-1].strip(")")
-        else:
-            st.warning("No matching results found.")
-    else:
-        st.info("Start typing above to search for a company...")
+    if search_selection:
+        ticker_symbol = search_selection.split("(")[-1].strip(")")
 
 except Exception as e:
     st.error(f"Error loading stock list: {e}")
