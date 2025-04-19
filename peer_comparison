@@ -1,4 +1,4 @@
-def peer_comparison(ticker_symbol):
+def Peer-to-peer comparison(ticker_symbol):
     # Get the company row based on the selected ticker
     company_row = df_stocks[df_stocks['Ticker'] == ticker_symbol]
     
