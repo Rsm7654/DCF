@@ -43,29 +43,16 @@ except Exception as e:
 if ticker_symbol:
     ticker = yf.Ticker(ticker_symbol)
 
-    tab1, tab2, tab3 = st.tabs(["💸 DCF Valuation", "📈 Price Chart", "📄 Financials"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Peer-to-peer Comparison"💸 DCF Valuation", "📈 Price Chart", "📄 Financials"])
 
     with tab1:
+        peer comparison(ticker)
+    with tab2:
         run_dcf(ticker)
 
-    with tab2:
+    with tab3:
         show_chart(ticker)
 
-    with tab3:
+    with tab4:
         show_financials(ticker, ticker_symbol)
-    # --- Peer Comparison ---
-    company_row = df_stocks[df_stocks['Ticker'] == ticker_symbol]
-    if not company_row.empty and 'Sector' in df_stocks.columns:
-        selected_sector = company_row.iloc[0]['Sector']
-        st.subheader(f"🧩 Peer Comparison in {selected_sector} Sector")
-
-        peers = df_stocks[df_stocks['Sector'] == selected_sector]
-
-        if not peers.empty:
-            st.dataframe(peers[['Company', 'Ticker', 'Sector', 'MarketCap', 'P/E', 'EPS']].sort_values(by='MarketCap', ascending=False))
-
-            # Optional: plot bar chart of market cap
-            st.bar_chart(peers.set_index('Company')['MarketCap'])
-
-        else:
-            st.info("No peers found in the same sector.")
+   
