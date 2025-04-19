@@ -19,11 +19,16 @@ def fetch_sector(ticker_symbol):
         st.error(f"Error fetching sector for {ticker_symbol}: {e}")
         return None
 
-def peer_comparison(ticker_symbol, df_stocks):
-    # Check if the 'Sector' column exists, if not, fetch it from Yahoo Finance
+def update_sector_info(df_stocks):
+    # Fetch sector information for all stocks if the sector is missing
     if 'Sector' not in df_stocks.columns:
         st.warning("Sector column is missing. Fetching sector data from Yahoo Finance.")
         df_stocks['Sector'] = df_stocks['Ticker'].apply(fetch_sector)
+    return df_stocks
+
+def peer_comparison(ticker_symbol, df_stocks):
+    # Update sector info before performing comparison
+    df_stocks = update_sector_info(df_stocks)
     
     # Get the company row based on the selected ticker
     company_row = df_stocks[df_stocks['Ticker'] == ticker_symbol]
@@ -53,5 +58,15 @@ def peer_comparison(ticker_symbol, df_stocks):
 
         # Optional: plot bar chart of market cap
         st.bar_chart(peers.set_index('Company')['MarketCap'])
+
+        # Optional: plot P/E ratio comparison
+        st.subheader("P/E Ratio Comparison")
+        st.bar_chart(peers.set_index('Company')['P/E'])
+
+        # Optional: plot EPS comparison
+        st.subheader("EPS Comparison")
+        st.bar_chart(peers.set_index('Company')['EPS'])
+
     else:
         st.info("No peers found in the same sector.")
+
