@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 import yfinance as yf
+import requests
+import io
+
 from dcf_valuation import run_dcf
 from price_chart import show_chart
 from financials import show_financials
@@ -8,13 +11,18 @@ from financials import show_financials
 st.set_page_config(page_title="📈 Stock Analyzer", layout="wide")
 st.title("📊 Stock Analyzer App")
 
-# --- Load Excel File from GitHub ---
-github_excel_url = "https://github.com/Rsm7654/DCF/blob/main/Stock_list%20(1).xlsx"
-try:
-    df_stocks = pd.read_excel(github_excel_url)
-    st.success("✅ Stock list loaded from GitHub.")
+# --- Load Excel File from GitHub RAW URL ---
+github_excel_url = "https://raw.githubusercontent.com/Rsm7654/DCF/main/Stock_list%20(1).xlsx"
+ticker_symbol = None
 
-    # Show uploaded stock list
+try:
+    # Download and read Excel from raw GitHub URL
+    response = requests.get(github_excel_url)
+    response.raise_for_status()
+    file_bytes = io.BytesIO(response.content)
+    df_stocks = pd.read_excel(file_bytes, engine='openpyxl')
+
+    st.success("✅ Stock list loaded from GitHub.")
     st.subheader("📃 Available Stocks")
     st.dataframe(df_stocks)
 
@@ -24,8 +32,6 @@ try:
         ticker_symbol = selected_ticker
     elif 'Company' in df_stocks.columns:
         selected_company = st.selectbox("🔍 Select a stock by company name", df_stocks['Company'])
-
-        # Map company to ticker using yfinance search
         try:
             search = yf.Search(selected_company)
             quotes = search.quotes
@@ -36,11 +42,9 @@ try:
             ticker_symbol = None
     else:
         st.warning("⚠️ No 'Ticker' or 'Company' column found in your Excel file.")
-        ticker_symbol = None
 
 except Exception as e:
     st.error(f"Error loading Excel file: {e}")
-    ticker_symbol = None
 
 # --- Load Data & Show Tabs ---
 if ticker_symbol:
