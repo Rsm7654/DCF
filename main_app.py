@@ -7,7 +7,7 @@ import io
 from dcf_valuation import run_dcf
 from price_chart import show_chart
 from financials import show_financials
-from peer_comparison import peer_comparison
+from peer_comparison import peer_comparison  # Correct import
 
 st.set_page_config(page_title="📈 Stock Analyzer", layout="wide")
 st.title("📊 Stock Analyzer App")
@@ -47,7 +47,8 @@ if ticker_symbol:
     tab1, tab2, tab3, tab4 = st.tabs(["Peer-to-peer Comparison", "💸 DCF Valuation", "📈 Price Chart", "📄 Financials"])
 
     with tab1:
-        peer comparison(ticker)
+        peer_comparison(ticker_symbol, df_stocks)  # Call peer comparison function
+
     with tab2:
         run_dcf(ticker)
 
@@ -56,4 +57,3 @@ if ticker_symbol:
 
     with tab4:
         show_financials(ticker, ticker_symbol)
-   
