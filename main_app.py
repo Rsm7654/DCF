@@ -23,7 +23,6 @@ try:
     response.raise_for_status()
     file_bytes = io.BytesIO(response.content)
     df_stocks = pd.read_excel(file_bytes, engine='openpyxl')
-    st.write("Columns in Excel file:", df_stocks.columns.tolist())
 
 
     st.success("✅ Stock list loaded.")
