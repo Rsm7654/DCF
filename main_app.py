@@ -13,7 +13,8 @@ st.set_page_config(page_title="📈 Stock Analyzer", layout="wide")
 st.title("📊 Stock Analyzer App")
 
 # --- Load Excel File from GitHub ---
-github_excel_url = "https://github.com/Rsm7654/DCF/blob/main/Stock_list%20(1).xlsx"
+# --- Load Excel File from GitHub ---
+github_excel_url = "https://raw.githubusercontent.com/Rsm7654/DCF/main/Stock_list%20(1).xlsx"
 ticker_symbol = None
 
 try:
