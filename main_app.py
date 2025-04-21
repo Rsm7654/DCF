@@ -13,7 +13,6 @@ st.set_page_config(page_title="📈 Stock Analyzer", layout="wide")
 st.title("📊 Stock Analyzer App")
 
 # --- Load Excel File from GitHub ---
-# --- Load Excel File from GitHub ---
 github_excel_url = "https://raw.githubusercontent.com/Rsm7654/DCF/main/Stock_list%20(1).xlsx"
 ticker_symbol = None
 
@@ -24,8 +23,16 @@ try:
     file_bytes = io.BytesIO(response.content)
     df_stocks = pd.read_excel(file_bytes, engine='openpyxl')
 
+    # Clean column names to remove spaces and ensure consistency
+    df_stocks.columns = df_stocks.columns.str.strip()
 
-    st.success("✅ Stock list loaded.")
+    # Check for required columns ('Company', 'Ticker', 'Sector')
+    required_cols = ['Ticker', 'Sector']
+    missing = [col for col in required_cols if col not in df_stocks.columns]
+    if missing:
+        st.error(f"❌ Missing columns in stock list: {', '.join(missing)}")
+    else:
+        st.success("✅ Stock list loaded.")
 
     # --- Build dropdown options
     df_stocks["SearchDisplay"] = df_stocks["Company"] + " (" + df_stocks["Ticker"] + ")"
@@ -37,9 +44,7 @@ try:
     )
 
     if search_selection:
-        ticker_symbol = search_selection.split("(")[-1].strip(")").strip()
-        ticker_symbol = ticker_symbol.replace("&", "")  # Remove invalid characters
-
+        ticker_symbol = search_selection.split("(")[-1].strip(")")
 
 except Exception as e:
     st.error(f"Error loading stock list: {e}")
@@ -61,3 +66,4 @@ if ticker_symbol:
 
     with tab4:
         show_financials(ticker, ticker_symbol)
+
