@@ -43,7 +43,7 @@ def peer_comparison(ticker_symbol, df_stocks):
     sector = selected_company.iloc[0]["Sector"]
     st.markdown(f"**Selected Company**: `{ticker_symbol}` | **Sector**: `{sector}`")
 
-    # Filter peers from same sector
+    # Filter peers from the same sector
     sector_peers = df_peers[df_peers["Sector"] == sector]
 
     if sector_peers.empty:
@@ -64,3 +64,6 @@ def peer_comparison(ticker_symbol, df_stocks):
 
     st.subheader("💵 EPS Comparison")
     st.bar_chart(sector_peers.set_index("Company")["EPS"])
+
+# Example usage (assuming you have a DataFrame df_stocks and a ticker_symbol)
+# peer_comparison(ticker_symbol, df_stocks)
