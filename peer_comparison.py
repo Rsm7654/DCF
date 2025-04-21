@@ -4,6 +4,13 @@ import pandas as pd
 
 def peer_comparison(selected_ticker, df_stocks):
     try:
+        # Check if 'Sector' and 'Ticker' columns are available
+        required_cols = ['Ticker', 'Sector']
+        missing = [col for col in required_cols if col not in df_stocks.columns]
+        if missing:
+            st.error(f"❌ Missing columns in stock list: {', '.join(missing)}")
+            return
+
         # Get the sector of the selected ticker
         selected_row = df_stocks[df_stocks["Ticker"] == selected_ticker]
         if selected_row.empty:
