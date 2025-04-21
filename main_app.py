@@ -37,7 +37,9 @@ try:
     )
 
     if search_selection:
-        ticker_symbol = search_selection.split("(")[-1].strip(")")
+        ticker_symbol = search_selection.split("(")[-1].strip(")").strip()
+        ticker_symbol = ticker_symbol.replace("&", "")  # Remove invalid characters
+
 
 except Exception as e:
     st.error(f"Error loading stock list: {e}")
