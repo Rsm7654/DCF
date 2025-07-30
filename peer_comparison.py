@@ -1,68 +1,34 @@
-import streamlit as st
-import yfinance as yf
-import pandas as pd
+def peer_comparison(ticker_symbol, df_stocks):
+    ticker = yf.Ticker(ticker_symbol)
+    sector = ticker.info.get("sector", None)
 
-# Function to extract sector from Yahoo Finance
-def get_sector_from_yf(ticker_symbol):
-    try:
-        # Fetch the stock data
-        stock = yf.Ticker(ticker_symbol)
+    if not sector:
+        st.warning("⚠️ Could not retrieve sector information from the ticker.")
+        return
 
-        # Extract the sector from the info dictionary
-        sector = stock.info.get("sector", "Sector not available")
-        return sector
-    except Exception as e:
-        st.warning(f"⚠️ Error fetching sector for {ticker_symbol}: {e}")
-        return None
+    st.write(f"🔍 Sector identified: **{sector}**")
 
-def peer_comparison(selected_ticker, df_stocks):
-    try:
-        # Check if 'Ticker' column is available
-        if 'Ticker' not in df_stocks.columns:
-            st.error("❌ 'Ticker' column is missing in the stock list.")
-            return
+    # Find peers in the same sector using `df_stocks`
+    df_stocks["Ticker"] = df_stocks["Ticker"].str.strip()
+    peer_tickers = []
 
-        # Get the sector of the selected ticker from Yahoo Finance
-        selected_sector = get_sector_from_yf(selected_ticker)
-        if not selected_sector:
-            st.warning(f"⚠️ Could not fetch sector for {selected_ticker}.")
-            return
+    for symbol in df_stocks["Ticker"]:
+        try:
+            peer_info = yf.Ticker(symbol).info
+            if peer_info.get("sector", "") == sector:
+                peer_tickers.append({
+                    "Ticker": symbol,
+                    "Company": df_stocks[df_stocks["Ticker"] == symbol]["Company"].values[0],
+                    "Sector": sector,
+                    "Market Cap": peer_info.get("marketCap", None),
+                    "PE Ratio": peer_info.get("trailingPE", None),
+                    "Price": peer_info.get("currentPrice", None)
+                })
+        except:
+            continue
 
-        # Filter peers from the same sector (dynamically fetch sector for each peer)
-        peer_tickers = df_stocks['Ticker'].tolist()
-        
-        st.subheader(f"📊 Peer Comparison for Sector: {selected_sector}")
-        comparison_data = []
-
-        for ticker in peer_tickers:
-            # Fetch sector dynamically for each ticker
-            peer_sector = get_sector_from_yf(ticker)
-            
-            if peer_sector and peer_sector == selected_sector:
-                try:
-                    stock = yf.Ticker(ticker)
-                    info = stock.info
-
-                    if info is None or "shortName" not in info:
-                        continue  # skip if data is incomplete or broken
-
-                    comparison_data.append({
-                        "Company": info.get("shortName", ticker),
-                        "Ticker": ticker,
-                        "Market Cap": info.get("marketCap"),
-                        "P/E Ratio": info.get("trailingPE"),
-                        "Return on Equity": info.get("returnOnEquity"),
-                        "Profit Margin": info.get("profitMargins"),
-                    })
-                except Exception as e:
-                    st.warning(f"⚠️ Could not fetch data for {ticker}: {e}")
-                    continue
-
-        if comparison_data:
-            df_comparison = pd.DataFrame(comparison_data)
-            st.dataframe(df_comparison)
-        else:
-            st.info("No valid peer data available to compare.")
-
-    except Exception as e:
-        st.error(f"An error occurred in peer comparison: {e}")
+    if peer_tickers:
+        df_peers = pd.DataFrame(peer_tickers)
+        st.dataframe(df_peers.set_index("Ticker"))
+    else:
+        st.info("No peers found in the same sector.")
