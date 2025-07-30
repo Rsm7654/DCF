@@ -15,14 +15,14 @@ def run_dcf(ticker):
         # Get cash flow data
         cashflow = ticker.cashflow
 
-        if "Operating Cash Flow" in cashflow.index and "Capital Expenditure" in cashflow.index:
-            ocf = cashflow.loc["Operating Cash Flow"]
-            capex = cashflow.loc["Capital Expenditure"]
-        else:
+        ocf = cashflow.loc["Operating Cash Flow"] if "Operating Cash Flow" in cashflow.index else None
+        capex = cashflow.loc["Capital Expenditure"] if "Capital Expenditure" in cashflow.index else None
+
+        if ocf is None or capex is None:
             st.error("⚠️ Required data ('Operating Cash Flow' or 'Capital Expenditure') is missing.")
             return
 
-        fcf = ocf + capex  # CapEx is negative, so addition is correct
+        fcf = ocf + capex  # CapEx is usually negative, so this adds correctly
         fcf = fcf.dropna()
 
         if fcf.empty:
@@ -51,35 +51,38 @@ def run_dcf(ticker):
         enterprise_value_cr = enterprise_value / 1e7
 
         # Display results
-        st.metric("Estimated Enterprise Value", f"₹ {enterprise_value_cr:,.2f} Cr")
+        st.metric("💰 Estimated Enterprise Value", f"₹ {enterprise_value_cr:,.2f} Cr")
 
         fcf_df = pd.DataFrame({
             "Year": [f"Year {i}" for i in range(1, forecast_years + 1)],
             "Future FCF (₹ Cr)": future_fcfs_cr,
             "Discounted FCF (₹ Cr)": discounted_fcfs_cr
-        })
-        st.dataframe(fcf_df.set_index("Year"))
-        st.line_chart(fcf_df.set_index("Year")[["Future FCF (₹ Cr)", "Discounted FCF (₹ Cr)"]])
+        }).set_index("Year")
+
+        st.dataframe(fcf_df)
+        st.line_chart(fcf_df)
 
         st.write(f"📌 **Discounted Terminal Value**: ₹ {discounted_terminal_cr:,.2f} Cr")
         st.write(f"📌 **Sum of Discounted FCFs**: ₹ {sum(discounted_fcfs_cr):,.2f} Cr")
         st.write("📌 **Enterprise Value = DCFs + Terminal Value**")
 
-        # Optional: Estimate fair value per share
+        # Estimate fair value per share
         try:
             balance_sheet = ticker.balance_sheet
-            cash = balance_sheet.loc["Cash And Cash Equivalents"] if "Cash And Cash Equivalents" in balance_sheet.index else 0
-            debt = balance_sheet.loc["Total Debt"] if "Total Debt" in balance_sheet.index else 0
+            cash = balance_sheet.loc["Cash And Cash Equivalents"].iloc[0] if "Cash And Cash Equivalents" in balance_sheet.index else 0
+            debt = balance_sheet.loc["Total Debt"].iloc[0] if "Total Debt" in balance_sheet.index else 0
             shares_outstanding = ticker.info.get("sharesOutstanding", 0)
 
             if shares_outstanding and shares_outstanding > 0:
                 equity_value = enterprise_value + cash - debt
                 fair_value_per_share = equity_value / shares_outstanding
-                fair_value_per_share_rs = fair_value_per_share  # INR-based
+                fair_value_rs = fair_value_per_share  # already ₹
 
-                st.metric("Estimated Fair Value per Share", f"₹ {fair_value_per_share_rs:,.2f}")
-        except Exception:
-            st.warning("⚠️ Fair value per share could not be calculated.")
+                st.metric("📈 Estimated Fair Value per Share", f"₹ {fair_value_rs:,.2f}")
+            else:
+                st.warning("⚠️ Shares outstanding not available to estimate fair value per share.")
+        except Exception as e:
+            st.warning(f"⚠️ Fair value per share could not be calculated: {e}")
 
     except Exception as e:
         st.exception(e)
