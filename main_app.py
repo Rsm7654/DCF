@@ -15,6 +15,7 @@ st.title("📊 Stock Analyzer App")
 # --- Load Excel File from GitHub ---
 github_excel_url = "https://raw.githubusercontent.com/Rsm7654/DCF/main/Stock_list%20(1).xlsx"
 ticker_symbol = None
+has_sector_column = False  # Track if 'Sector' exists
 
 try:
     # Fetch and read the Excel file
@@ -25,12 +26,14 @@ try:
 
     # Clean and validate columns
     df_stocks.columns = df_stocks.columns.str.strip()
-    required_cols = ['Company', 'Ticker', 'Sector']
-    missing = [col for col in required_cols if col not in df_stocks.columns]
+    has_sector_column = "Sector" in df_stocks.columns
 
-    if missing:
-        st.error(f"❌ Missing columns in stock list: {', '.join(missing)}")
+    if not {"Ticker", "Company"}.issubset(df_stocks.columns):
+        st.error("❌ The Excel must contain at least 'Ticker' and 'Company' columns.")
     else:
+        if not has_sector_column:
+            st.warning("⚠️ 'Sector' column missing. Peer comparison will be disabled.")
+
         st.success("✅ Stock list loaded successfully.")
 
         # Build searchable dropdown
@@ -52,18 +55,33 @@ except Exception as e:
 if ticker_symbol:
     ticker = yf.Ticker(ticker_symbol)
 
-    tab1, tab2, tab3, tab4 = st.tabs([
-        "🔗 Peer Comparison", "💸 DCF Valuation", "📈 Price Chart", "📄 Financials"
-    ])
+    if has_sector_column:
+        tab1, tab2, tab3, tab4 = st.tabs([
+            "🔗 Peer Comparison", "💸 DCF Valuation", "📈 Price Chart", "📄 Financials"
+        ])
 
-    with tab1:
-        peer_comparison(ticker_symbol, df_stocks)
+        with tab1:
+            peer_comparison(ticker_symbol, df_stocks)
 
-    with tab2:
-        run_dcf(ticker)
+        with tab2:
+            run_dcf(ticker)
 
-    with tab3:
-        show_chart(ticker)
+        with tab3:
+            show_chart(ticker)
 
-    with tab4:
-        show_financials(ticker, ticker_symbol)
+        with tab4:
+            show_financials(ticker, ticker_symbol)
+
+    else:
+        tab1, tab2, tab3 = st.tabs([
+            "💸 DCF Valuation", "📈 Price Chart", "📄 Financials"
+        ])
+
+        with tab1:
+            run_dcf(ticker)
+
+        with tab2:
+            show_chart(ticker)
+
+        with tab3:
+            show_financials(ticker, ticker_symbol)
