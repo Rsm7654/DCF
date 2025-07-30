@@ -15,24 +15,24 @@ def run_dcf(ticker):
         # Get cash flow data
         cashflow = ticker.cashflow
 
-        ocf = cashflow.loc.get("Operating Cash Flow")
-        capex = cashflow.loc.get("Capital Expenditure")
-
-        if ocf is None or capex is None:
-            st.error("Required cash flow data (OCF or CapEx) not found.")
+        if "Operating Cash Flow" in cashflow.index and "Capital Expenditure" in cashflow.index:
+            ocf = cashflow.loc["Operating Cash Flow"]
+            capex = cashflow.loc["Capital Expenditure"]
+        else:
+            st.error("⚠️ Required data ('Operating Cash Flow' or 'Capital Expenditure') is missing.")
             return
 
         fcf = ocf + capex  # CapEx is negative, so addition is correct
         fcf = fcf.dropna()
 
-        if fcf.empty or len(fcf) < 1:
-            st.error("Insufficient Free Cash Flow data to compute valuation.")
+        if fcf.empty:
+            st.error("⚠️ No valid Free Cash Flow data available.")
             return
 
         avg_fcf = fcf.iloc[:min(3, len(fcf))].mean()
 
         if wacc <= terminal_growth:
-            st.error("WACC must be greater than Terminal Growth Rate.")
+            st.error("⚠️ WACC must be greater than Terminal Growth Rate.")
             return
 
         # Forecast future FCFs
@@ -68,18 +68,18 @@ def run_dcf(ticker):
         # Optional: Estimate fair value per share
         try:
             balance_sheet = ticker.balance_sheet
-            cash = balance_sheet.loc.get("Cash And Cash Equivalents", 0)
-            debt = balance_sheet.loc.get("Total Debt", 0)
+            cash = balance_sheet.loc["Cash And Cash Equivalents"] if "Cash And Cash Equivalents" in balance_sheet.index else 0
+            debt = balance_sheet.loc["Total Debt"] if "Total Debt" in balance_sheet.index else 0
             shares_outstanding = ticker.info.get("sharesOutstanding", 0)
 
             if shares_outstanding and shares_outstanding > 0:
                 equity_value = enterprise_value + cash - debt
                 fair_value_per_share = equity_value / shares_outstanding
-                fair_value_per_share_rs = fair_value_per_share  # Already in ₹ if source is INR
+                fair_value_per_share_rs = fair_value_per_share  # INR-based
 
                 st.metric("Estimated Fair Value per Share", f"₹ {fair_value_per_share_rs:,.2f}")
-        except Exception as e:
-            st.warning("Fair value per share could not be calculated.")
+        except Exception:
+            st.warning("⚠️ Fair value per share could not be calculated.")
 
     except Exception as e:
         st.exception(e)
